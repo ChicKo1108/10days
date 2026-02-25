@@ -1,13 +1,50 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/quest/index",
+    "pages/plan/index",
+    "pages/profile/index",
+    "pages/quest-detail/index",
+    "pages/plan-create/index",
+    "pages/quest-create/index",
+    "pages/review/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "10日计划",
+    "navigationBarBackgroundColor": "#F7F4ED",
+    "navigationBarTitleText": "十日计划",
     "navigationBarTextStyle": "black"
   },
+  "tabBar": {
+    "color": "#888888",
+    "selectedColor": "#B22222",
+    "backgroundColor": "#F7F4ED",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/quest/index",
+        "text": "篇章",
+        "iconPath": "assets/images/tab-quest.png",
+        "selectedIconPath": "assets/images/tab-quest-active.png"
+      },
+      {
+        "pagePath": "pages/plan/index",
+        "text": "长卷",
+        "iconPath": "assets/images/tab-plan.png",
+        "selectedIconPath": "assets/images/tab-plan-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我",
+        "iconPath": "assets/images/tab-profile.png",
+        "selectedIconPath": "assets/images/tab-profile-active.png"
+      }
+    ]
+  },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "usingComponents": {
+    "ink-btn": "/components/InkButton/index",
+    "paper-card": "/components/PaperCard/index",
+    "ink-loading": "/components/InkLoading/index"
+  }
 }
