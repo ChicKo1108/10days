@@ -1,0 +1,6 @@
+Component({
+  externalClasses: ['className'],
+  properties: {
+    
+  }
+})

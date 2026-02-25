@@ -1,0 +1,23 @@
+.paper-card {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin: 20rpx 0;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  position: relative;
+  background-image: linear-gradient(to bottom right, #fff, #fcfcfc);
+}
+
+/* 卷角效果 */
+.paper-card::after {
+  content: '';
+  position: absolute;
+  bottom: 10rpx;
+  right: 10rpx;
+  width: 90%;
+  height: 20rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.08);
+  z-index: -1;
+  border-radius: 50%;
+  transform: rotate(-1deg);
+}

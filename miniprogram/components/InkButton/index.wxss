@@ -1,0 +1,43 @@
+.ink-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 40rpx;
+  border-radius: 8rpx;
+  font-family: var(--font-song);
+  font-size: 32rpx;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box; /* 关键修复：避免尺寸计算问题 */
+}
+
+/* 默认样式 (主要按钮) */
+.ink-btn.primary {
+  background-color: var(--ink-black);
+  color: var(--paper-bg);
+  box-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.ink-btn.primary:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 次要按钮 */
+.ink-btn.secondary {
+  background-color: transparent;
+  color: var(--ink-black);
+  border: 2rpx solid var(--ink-black);
+}
+
+.ink-btn.secondary:active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 幽灵按钮 (文字链) */
+.ink-btn.ghost {
+  padding: 0;
+  color: var(--ink-gray);
+  background: transparent;
+}

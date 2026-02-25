@@ -1,0 +1,3 @@
+<view class="paper-card {{className}}">
+  <slot></slot>
+</view>

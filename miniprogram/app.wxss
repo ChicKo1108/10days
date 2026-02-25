@@ -1,10 +1,88 @@
 /**app.wxss**/
+page {
+  /* --- 新中式水墨风色板 (New Chinese Ink Wash Palette) --- */
+  --paper-bg: #F7F4ED;       /* 宣纸色：温暖、古朴 */
+  --ink-black: #2C2C2C;      /* 松烟墨：深沉、有力 */
+  --ink-light: #5A5A5A;      /* 淡墨：层次感 */
+  --ink-gray: #888888;       /* 灰墨：辅助信息 */
+  --cinnabar-red: #B22222;   /* 朱砂红：点睛、印章 */
+  --cinnabar-light: #D45D5D; /* 浅朱砂：交互态 */
+  
+  /* --- 字体系统 (Typography) --- */
+  /* 标题：宋体/明体，强调人文气息 */
+  --font-song: "HiraMinProN-W6", "Source Han Serif CN", "Songti SC", "SimSun", serif;
+  /* 正文：黑体，确保易读性 */
+  --font-sans: "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+
+  /* --- 纹理 (Texture) --- */
+  /* 宣纸噪点纹理 */
+  --paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+
+  /* --- 全局样式 --- */
+  background-color: var(--paper-bg);
+  color: var(--ink-black);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  
+  /* 纹理叠加 */
+  background-image: var(--paper-texture);
+  background-attachment: fixed; /* 固定背景纹理 */
+}
+
 .container {
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
   box-sizing: border-box;
-} 
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* --- 工具类 (Utilities) --- */
+.font-song { font-family: var(--font-song); font-weight: 600; }
+.font-sans { font-family: var(--font-sans); }
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+.text-ink { color: var(--ink-black); }
+.text-gray { color: var(--ink-gray); }
+.text-red { color: var(--cinnabar-red); }
+
+/* 布局 */
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-row { display: flex; flex-direction: row; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* --- 动效 (Animations) --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.anim-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 墨水洇染动画 (用于点击反馈) */
+@keyframes inkSpread {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* 印章落下动画 */
+@keyframes stampFall {
+  0% { transform: scale(3); opacity: 0; }
+  60% { transform: scale(0.9); opacity: 1; }
+  80% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}

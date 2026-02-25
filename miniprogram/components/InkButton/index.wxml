@@ -1,0 +1,3 @@
+<view class="ink-btn {{type}}" bindtap="handleTap">
+  <slot></slot>
+</view>
