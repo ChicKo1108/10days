@@ -1,0 +1,66 @@
+<view class="container">
+  <!-- 固定头部 -->
+  <view class="fixed-header anim-fade-in">
+    <view class="header-content">
+      <text class="subtitle font-sans text-gray">千里之行，始于足下</text>
+      <text class="title font-song">长卷全景</text>
+      <view class="ink-line"></view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="plans-scroll anim-fade-in" style="animation-delay: 0.2s;">
+    <view class="plans-list">
+      <view class="plan-section" wx:for="{{plans}}" wx:key="id">
+        <view class="plan-header">
+          <text class="plan-title font-song">{{item.title}}</text>
+          <text class="plan-days font-sans text-gray">共 {{item.totalDays}} 天 / {{item.chapters.length}} 篇</text>
+        </view>
+
+        <scroll-view scroll-x class="chapter-scroll" enable-flex>
+          <view class="timeline-container">
+            <!-- 贯穿线 -->
+            <view class="timeline-line"></view>
+
+            <view 
+              class="chapter-item" 
+              wx:for="{{item.chapters}}" 
+              wx:key="id" 
+              wx:for-item="chapter"
+              bindtap="goToChapter"
+              data-id="{{chapter.id}}"
+              data-status="{{chapter.status}}"
+            >
+              <!-- 状态点 -->
+              <view class="connection-dot {{chapter.status === 'completed' || chapter.status === 'ongoing' ? 'filled' : ''}} {{chapter.status === 'ongoing' ? 'pulsing' : ''}}"></view>
+              
+              <!-- 篇章卡片 -->
+              <view class="chapter-card {{chapter.status}}">
+                <text class="chapter-num font-song">第 {{chapter.num}} 篇</text>
+                <view class="chapter-status-text font-sans">
+                  <text wx:if="{{chapter.status === 'completed'}}">已结项</text>
+                  <text wx:elif="{{chapter.status === 'ongoing'}}" class="text-red">进行中</text>
+                  <text wx:else class="text-gray">待解锁</text>
+                </view>
+                <text class="chapter-rate font-sans text-gray" wx:if="{{chapter.status !== 'locked'}}">达成 {{chapter.rate}}%</text>
+              </view>
+            </view>
+            
+            <!-- 尾部占位，保证最后一个卡片显示完整 -->
+            <view class="spacer"></view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 底部创建按钮 (改为固定在底部) -->
+      <view class="footer-spacer"></view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部固定操作区 -->
+  <view class="fab-container anim-fade-in" style="animation-delay: 0.4s;">
+    <view class="fab-btn" bindtap="goToCreatePlan">
+      <text class="plus-icon font-song">+</text> 
+      <text class="fab-text font-song">绘制长卷</text>
+    </view>
+  </view>
+</view>

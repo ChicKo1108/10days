@@ -1,0 +1,109 @@
+<view class="container">
+  <!-- 顶部：10天进度条 (String of Pearls) -->
+  <view class="progress-header anim-fade-in">
+    <view class="progress-track">
+      <view class="track-line"></view>
+      <view 
+        class="day-node {{index + 1 === selectedDay ? 'selected' : ''}} {{index + 1 === currentDay ? 'current' : ''}} {{index + 1 < currentDay ? 'completed' : ''}} {{index + 1 > currentDay ? 'locked' : ''}}" 
+        wx:for="{{10}}" 
+        wx:key="*this"
+        bindtap="switchDay"
+        data-day="{{index + 1}}"
+      >
+        <view class="node-ink"></view>
+        <!-- 移除数字显示 -->
+      </view>
+    </view>
+  </view>
+
+  <!-- 核心卡片：每日任务 -->
+  <view class="main-card-container anim-fade-in" style="animation-delay: 0.2s;">
+    <paper-card className="daily-card">
+      <!-- 装饰印章 (已完成/已留白) -->
+      <view class="seal-mark {{skippedStamp ? 'skipped' : ''}}" wx:if="{{status === 'completed' || status === 'skipped'}}">
+        <view class="seal-inner font-song">{{stampText}}</view>
+      </view>
+
+      <view class="card-header text-center">
+        <!-- 所属长卷跳转 -->
+        <view class="plan-link font-sans text-gray" bindtap="goToPlanDetail" wx:if="{{planTitle}}">
+          <text>所属长卷：{{planTitle}} ></text>
+        </view>
+
+        <text class="day-indicator font-song">第 {{selectedDay}} 篇</text>
+        <text class="date-display font-sans text-gray">2026.02.25 星期三</text>
+        <!-- 编辑入口 -->
+        <view class="edit-entry" bindtap="goToEdit" wx:if="{{selectedDay > currentDay}}">
+          <text class="edit-icon font-song">✎</text>
+          <text class="edit-text font-sans">修订</text>
+        </view>
+      </view>
+      
+      <view class="card-body">
+        <view class="task-title font-song">今日修习</view>
+        <view class="task-content font-song">
+          <text class="task-text">
+            1. 练习 C 和弦转换 (15min)
+            2. 保持指关节弯曲，指尖垂直触弦
+            3. 尝试弹唱《小星星》前两句
+          </text>
+        </view>
+      </view>
+
+      <view class="card-footer">
+        <view class="note-section">
+          <view class="note-header">
+            <text class="note-title font-song">心得 · 拾遗</text>
+            <text class="note-hint font-sans text-gray">今日学到了什么？(例如：指尖触弦要垂直)</text>
+          </view>
+          <view class="note-input-wrapper">
+             <textarea 
+              class="note-input font-sans" 
+              placeholder="记下今日的心得与感悟..." 
+              placeholder-class="placeholder"
+              maxlength="200"
+            ></textarea>
+          </view>
+        </view>
+      </view>
+    </paper-card>
+  </view>
+
+  <!-- 底部操作区 (仅在“今天”且“未完成”时显示操作，其他情况占位或显示提示) -->
+  <view class="action-bar anim-fade-in" style="animation-delay: 0.4s;">
+    <block wx:if="{{selectedDay === currentDay && status === 'pending'}}">
+      <view class="left-action">
+        <ink-btn type="secondary" bindtap="handleSkip">
+          <text class="action-text">留白 (2/3)</text>
+        </ink-btn>
+      </view>
+      
+      <view class="center-action">
+        <!-- 盖章按钮 -->
+        <view 
+          class="stamp-btn {{isPressed ? 'pressed' : ''}}" 
+          bindtouchstart="handleStampStart" 
+          bindtouchend="handleStampEnd"
+          bindtap="handleCheckIn"
+        >
+          <view class="stamp-border">
+            <view class="stamp-text font-song">完成</view>
+          </view>
+          <!-- 洇染动画层 -->
+          <view class="ink-ripple" wx:if="{{isPressed}}"></view>
+        </view>
+      </view>
+
+      <view class="right-action">
+        <!-- 占位 -->
+        <view style="width: 120rpx;"></view> 
+      </view>
+    </block>
+    
+    <block wx:else>
+      <view class="status-tip font-song text-gray">
+        {{selectedDay > currentDay ? '静待明日开启' : '往事已矣，不可追忆'}}
+      </view>
+    </block>
+  </view>
+</view>

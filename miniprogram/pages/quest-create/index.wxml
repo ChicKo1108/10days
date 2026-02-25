@@ -1,0 +1,105 @@
+<view class="container">
+  <view class="header anim-fade-in">
+    <text class="title font-song">{{isEdit ? '修订篇章' : '规划篇章'}}</text>
+    <text class="subtitle font-sans text-gray">书童已为您{{isEdit ? '重绘' : '拆解'}}方案，请确认或修改</text>
+    
+    <!-- 长卷模式提示 -->
+    <view class="plan-tag font-sans" wx:if="{{type === 'plan' && planTitle}}">
+      <text>所属长卷：{{planTitle}}</text>
+    </view>
+    
+    <view class="ink-line"></view>
+  </view>
+
+  <scroll-view scroll-y class="plan-scroll anim-fade-in" style="animation-delay: 0.2s;">
+    <!-- 多篇章预览 (长卷模式) -->
+    <block wx:if="{{type === 'plan'}}">
+      <view class="stage-section" wx:for="{{chapters}}" wx:key="index">
+        <view class="stage-header">
+          <text class="stage-title font-song">第 {{index + 1}} 篇章 ({{item.isLocked ? '待解锁' : '即将开启'}})</text>
+        </view>
+        
+        <block wx:if="{{!item.isLocked}}">
+          <!-- 篇章基础任务 -->
+          <paper-card>
+             <view class="task-label font-song text-gray">每日修习</view>
+             <view class="task-input-wrapper">
+              <textarea 
+                class="task-input font-sans" 
+                auto-height 
+                value="{{item.baseTask}}" 
+                bindinput="handleChapterBaseInput" 
+                data-index="{{index}}"
+              ></textarea>
+            </view>
+          </paper-card>
+
+          <!-- 篇章阶段任务 -->
+          <view class="sub-stages">
+             <view class="sub-stage-item" wx:for="{{item.stages}}" wx:key="sIndex" wx:for-item="stage" wx:for-index="sIndex">
+                <text class="sub-stage-label font-sans text-gray">{{stage.name}} ({{stage.days}})</text>
+                <input class="sub-stage-input font-sans" value="{{stage.task}}" bindinput="handleChapterStageInput" data-cindex="{{index}}" data-sindex="{{sIndex}}" />
+             </view>
+          </view>
+        </block>
+
+        <block wx:else>
+           <paper-card className="locked-card">
+             <view class="locked-content text-center">
+               <text class="locked-icon">🔒</text>
+               <text class="locked-text font-song text-gray">完成前序篇章后解锁</text>
+             </view>
+           </paper-card>
+        </block>
+      </view>
+    </block>
+
+    <!-- 单篇章模式 (原有逻辑) -->
+    <block wx:else>
+      <!-- 基础期 (Day 1-10 每日重复) -->
+      <view class="stage-section">
+        <view class="stage-header">
+          <text class="stage-title font-song">基石 · 每日修习</text>
+          <text class="stage-desc font-sans text-gray">贯穿十日的每日必修课</text>
+        </view>
+        <paper-card>
+          <view class="task-input-wrapper">
+            <textarea 
+              class="task-input font-sans" 
+              auto-height 
+              value="{{baseTask}}" 
+              bindinput="handleInput" 
+              data-field="baseTask"
+              placeholder="例如：每日练习爬格子 15 分钟"
+            ></textarea>
+          </view>
+        </paper-card>
+      </view>
+
+      <!-- 进阶三阶段 -->
+      <view class="stage-section" wx:for="{{stages}}" wx:key="index">
+        <view class="stage-header">
+          <text class="stage-title font-song">{{item.name}} ({{item.days}})</text>
+        </view>
+        <paper-card>
+          <view class="task-input-wrapper">
+            <textarea 
+              class="task-input font-sans" 
+              auto-height 
+              value="{{item.task}}" 
+              bindinput="handleStageInput" 
+              data-index="{{index}}"
+              placeholder="请输入阶段目标..."
+            ></textarea>
+          </view>
+        </paper-card>
+      </view>
+    </block>
+
+    <view class="footer-spacer"></view>
+  </scroll-view>
+
+  <view class="footer anim-fade-in" style="animation-delay: 0.4s;">
+    <ink-btn type="primary" bindtap="confirmPlan">{{isEdit ? '确认修订' : '确认开启'}}</ink-btn>
+  </view>
+</view>

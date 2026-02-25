@@ -1,0 +1,139 @@
+.header {
+  padding: 40rpx 40rpx 20rpx;
+}
+
+.title {
+  font-size: 56rpx;
+  color: var(--ink-black);
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.plan-tag {
+  display: inline-block;
+  background-color: rgba(178, 34, 34, 0.05);
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  color: var(--cinnabar-red);
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  border: 1rpx solid rgba(178, 34, 34, 0.2);
+}
+
+.ink-line {
+  width: 80rpx;
+  height: 6rpx;
+  background-color: var(--cinnabar-red);
+  border-radius: 4rpx;
+  opacity: 0.8;
+}
+
+.plan-scroll {
+  flex: 1;
+  padding: 20rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.stage-section {
+  margin-bottom: 50rpx;
+}
+
+.stage-header {
+  margin-bottom: 20rpx;
+  border-left: 6rpx solid var(--ink-black);
+  padding-left: 20rpx;
+}
+
+.stage-title {
+  font-size: 32rpx;
+  color: var(--ink-black);
+  display: block;
+  font-weight: bold;
+}
+
+.stage-desc {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.task-input-wrapper {
+  padding: 10rpx 0;
+}
+
+.task-input {
+  width: 100%;
+  font-size: 30rpx;
+  line-height: 1.6;
+  color: var(--ink-black);
+  min-height: 80rpx;
+}
+
+.task-label {
+  font-size: 24rpx;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.sub-stages {
+  padding: 0 20rpx;
+}
+
+.sub-stage-item {
+  margin-bottom: 20rpx;
+  border-bottom: 1rpx dashed rgba(0,0,0,0.1);
+  padding-bottom: 10rpx;
+}
+
+.sub-stage-label {
+  font-size: 24rpx;
+  color: var(--ink-gray);
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.sub-stage-input {
+  font-size: 28rpx;
+  width: 100%;
+}
+
+.locked-card {
+  opacity: 0.6;
+  background-color: rgba(0,0,0,0.02);
+}
+
+.locked-content {
+  padding: 40rpx 0;
+}
+
+.locked-icon {
+  font-size: 40rpx;
+  display: block;
+  margin-bottom: 10rpx;
+  opacity: 0.5;
+}
+
+.locked-text {
+  font-size: 24rpx;
+}
+
+.footer-spacer {
+  height: 180rpx;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--paper-bg) 80%, rgba(247, 244, 237, 0));
+  text-align: center;
+  z-index: 10;
+}

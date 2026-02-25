@@ -1,0 +1,80 @@
+<view class="container">
+  <view class="header text-center anim-fade-in">
+    <text class="title font-song">立项</text>
+    <text class="subtitle font-sans text-gray">十日一进，裁篇章以润长卷。</text>
+    <view class="divider"></view>
+  </view>
+
+  <!-- 类型选择区 -->
+  <view class="type-selection anim-fade-in" style="animation-delay: 0.1s;" wx:if="{{step === 1}}">
+    <view class="selection-card {{type === 'plan' ? 'active' : ''}}" bindtap="selectType" data-type="plan">
+      <view class="card-icon font-song">卷</view>
+      <view class="card-info">
+        <text class="card-title font-song">绘长卷</text>
+        <text class="card-desc font-sans text-gray">定宏大愿景，续连绵墨迹。适用于30日以上的长线目标。书童将为您裁切为若干个“十日篇章”，助你分段落笔，行稳致远。</text>
+      </view>
+      <view class="radio-circle {{type === 'plan' ? 'checked' : ''}}"></view>
+    </view>
+
+    <view class="selection-card {{type === 'quest' ? 'active' : ''}}" bindtap="selectType" data-type="quest">
+      <view class="card-icon font-song">篇</view>
+      <view class="card-info">
+        <text class="card-title font-song">裁篇章</text>
+        <text class="card-desc font-sans text-gray">专当下修行，成十日之功。适用于单次短期的十日冲刺。书童为你定制本旬的执行细节，助你心无旁骛，速写圆满。</text>
+      </view>
+      <view class="radio-circle {{type === 'quest' ? 'checked' : ''}}"></view>
+    </view>
+
+    <view class="footer-btn">
+      <ink-btn type="primary" bindtap="nextStep">下一步</ink-btn>
+    </view>
+  </view>
+
+  <!-- 表单填写区 -->
+  <view class="form-content anim-fade-in" style="animation-delay: 0.1s;" wx:if="{{step === 2 && !loading}}">
+    <view class="form-header">
+      <text class="form-title font-song">{{type === 'plan' ? '绘制长卷' : '开启篇章'}}</text>
+      <text class="back-link font-sans text-gray" bindtap="prevStep">返回选择</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label font-song">目标名称</text>
+      <input class="input font-sans" placeholder="例如：{{type === 'plan' ? '精通尤克里里' : '背诵100个单词'}}" bindinput="handleInput" data-field="title" value="{{title}}" />
+    </view>
+    
+    <view class="form-item" wx:if="{{type === 'plan'}}">
+      <text class="label font-song">预计天数</text>
+      <input class="input font-sans" type="number" placeholder="例如：30" bindinput="handleInput" data-field="days" value="{{days}}" />
+      
+      <!-- 预设天数按钮 -->
+      <view class="preset-days">
+        <view class="preset-btn font-sans {{days == item ? 'active' : ''}}" wx:for="{{[10, 30, 60, 90]}}" wx:key="*this" bindtap="selectPresetDay" data-day="{{item}}">
+          {{item}}天
+        </view>
+      </view>
+
+      <text class="helper-text font-sans text-gray">将自动拆分为 <text class="highlight">{{chapterCount}}</text> 个篇章</text>
+    </view>
+
+    <view class="form-item" wx:if="{{type === 'quest'}}">
+      <view class="label-row">
+        <text class="label font-song">所属长卷 (可选)</text>
+        <text class="clear-btn font-sans text-gray" wx:if="{{planIndex !== null}}" bindtap="clearPlanSelection">清除选择</text>
+      </view>
+      <picker bindchange="bindPlanChange" value="{{planIndex}}" range="{{plans}}">
+        <view class="picker font-sans {{planIndex !== null ? 'text-ink' : 'text-gray'}}">
+          {{planIndex !== null ? plans[planIndex] : '点击选择关联的长卷...'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="btn-area">
+      <ink-btn type="primary" bindtap="startPlan">生成计划</ink-btn>
+    </view>
+  </view>
+
+  <!-- Loading 状态 -->
+  <view class="loading-area anim-fade-in" wx:if="{{loading}}">
+    <ink-loading text="正在为您裁切篇章..."></ink-loading>
+  </view>
+</view>

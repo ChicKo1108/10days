@@ -1,0 +1,338 @@
+.container {
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--paper-bg);
+}
+
+/* --- 进度条 --- */
+.progress-header {
+  padding: 40rpx 20rpx;
+  background-color: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+}
+
+.progress-track {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 20rpx;
+}
+
+.track-line {
+  position: absolute;
+  top: 24rpx;
+  left: 40rpx;
+  right: 40rpx;
+  height: 2rpx;
+  background-color: #d0d0d0;
+  z-index: 0;
+}
+
+.day-node {
+  width: 50rpx;
+  height: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.node-ink {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 4rpx solid #ccc;
+  transition: all 0.3s ease;
+  margin-top: 14rpx;
+}
+
+.node-num {
+  font-size: 20rpx;
+  color: var(--ink-gray);
+  margin-top: 8rpx;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* 1. 已完成 (Completed): 黑色实心 */
+.day-node.completed .node-ink {
+  background-color: var(--ink-black);
+  border-color: var(--ink-black);
+}
+
+/* 2. 当前进行中 (Current): 红色实心 */
+.day-node.current .node-ink {
+  background-color: var(--cinnabar-red);
+  border-color: var(--cinnabar-red);
+}
+
+/* 3. 被选中 (Selected): 红色空心圈 (用于区分查看的天数) */
+.day-node.selected .node-ink {
+  transform: scale(1.4);
+  background-color: var(--paper-bg); /* 改为背景色遮挡横线 */
+  border-color: var(--cinnabar-red);
+  border-width: 4rpx;
+  position: relative; /* 确保层级高于 track-line */
+  z-index: 2;
+}
+
+/* 选中且是当前天 -> 实心红 + 大圈 */
+.day-node.selected.current .node-ink {
+  background-color: var(--cinnabar-red);
+}
+
+/* 选中且已完成 -> 实心黑 + 红圈 (可选，或者保持黑) */
+.day-node.selected.completed .node-ink {
+  border-color: var(--cinnabar-red);
+}
+
+/* 选中时显示数字 */
+.day-node.selected .node-num {
+  opacity: 1;
+  font-weight: bold;
+  color: var(--cinnabar-red);
+}
+
+
+/* --- 核心卡片 --- */
+.main-card-container {
+  flex: 1;
+  padding: 20rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.daily-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.seal-mark {
+  position: absolute;
+  top: 40rpx;
+  right: 40rpx;
+  width: 120rpx;
+  height: 120rpx;
+  border: 6rpx solid var(--cinnabar-red);
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-15deg);
+  opacity: 0.9;
+  z-index: 10;
+  animation: stampFall 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.seal-inner {
+  color: var(--cinnabar-red);
+  font-size: 40rpx;
+  font-weight: bold;
+  border: 2rpx solid var(--cinnabar-red);
+  padding: 10rpx;
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 留白印章样式：黑色 */
+.seal-mark.skipped {
+  border-color: var(--ink-black);
+}
+.seal-mark.skipped .seal-inner {
+  color: var(--ink-black);
+  border-color: var(--ink-black);
+}
+
+.card-header {
+  margin-bottom: 40rpx;
+  border-bottom: 2rpx solid rgba(0,0,0,0.05);
+  padding-bottom: 30rpx;
+  position: relative; /* 为编辑按钮定位 */
+}
+
+.plan-link {
+  font-size: 24rpx;
+  margin-bottom: 16rpx;
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  background-color: rgba(0,0,0,0.03);
+  border-radius: 8rpx;
+}
+
+.edit-entry {
+  position: absolute;
+  right: 0;
+  top: 10rpx;
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  border-radius: 30rpx;
+  background-color: rgba(0,0,0,0.03);
+}
+
+.edit-icon {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+  color: var(--ink-gray);
+}
+
+.edit-text {
+  font-size: 22rpx;
+  color: var(--ink-gray);
+}
+
+.day-indicator {
+  font-size: 56rpx;
+  color: var(--ink-black);
+  display: block;
+}
+
+.date-display {
+  font-size: 26rpx;
+  margin-top: 10rpx;
+}
+
+.card-body {
+  flex: 1;
+}
+
+.task-title {
+  font-size: 36rpx;
+  margin-bottom: 30rpx;
+  color: var(--ink-light);
+  display: flex;
+  align-items: center;
+}
+
+.task-title::before {
+  content: '';
+  width: 8rpx;
+  height: 32rpx;
+  background-color: var(--cinnabar-red);
+  margin-right: 16rpx;
+  border-radius: 4rpx;
+}
+
+.task-content {
+  background-color: rgba(0,0,0,0.02);
+  padding: 30rpx;
+  border-radius: 12rpx;
+  line-height: 2;
+}
+
+.task-text {
+  font-size: 32rpx;
+  color: var(--ink-black);
+}
+
+.card-footer {
+  margin-top: 40rpx;
+}
+
+/* 笔记区域优化 */
+.note-section {
+  border: 2rpx solid rgba(0,0,0,0.1);
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.note-header {
+  margin-bottom: 16rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.note-title {
+  font-size: 32rpx;
+  color: var(--ink-black);
+  font-weight: bold;
+}
+
+.note-hint {
+  font-size: 24rpx;
+  margin-top: 4rpx;
+}
+
+.note-input-wrapper {
+  /* 内部留白，无需样式 */
+}
+
+.note-input {
+  width: 100%;
+  height: 120rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+  padding: 0; /* 移除默认 padding */
+}
+
+/* --- 底部操作栏 --- */
+.action-bar {
+  height: 180rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 60rpx 40rpx;
+  position: relative;
+}
+
+.status-tip {
+  width: 100%;
+  text-align: center;
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+}
+
+.stamp-btn {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background-color: var(--ink-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.3);
+  position: relative;
+  transition: transform 0.1s;
+}
+
+.stamp-border {
+  width: 120rpx;
+  height: 120rpx;
+  border: 2rpx solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stamp-text {
+  color: #fff;
+  font-size: 40rpx;
+  letter-spacing: 4rpx;
+}
+
+.stamp-btn:active {
+  transform: scale(0.95);
+}
+
+.ink-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--cinnabar-red);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  animation: inkSpread 0.6s ease-out infinite;
+}

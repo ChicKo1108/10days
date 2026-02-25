@@ -1,0 +1,41 @@
+<view class="container">
+  <!-- 固定头部：日期与标题 -->
+  <view class="fixed-header anim-fade-in">
+    <view class="header-content">
+      <text class="date font-sans text-gray">二月廿五 · 今日</text>
+      <text class="title font-song">十日阵地</text>
+      <view class="ink-line"></view>
+    </view>
+  </view>
+
+  <!-- 列表内容 (添加顶部 padding 避开固定头部) -->
+  <scroll-view scroll-y class="content anim-fade-in" style="animation-delay: 0.2s;">
+    <!-- 列表项：使用卡片封装 -->
+    <paper-card wx:for="{{[1,2,3]}}" wx:key="*this" bindtap="goToDetail" data-id="{{item}}">
+      <view class="quest-item">
+        <view class="quest-info">
+          <text class="quest-title font-song">吉他入门：和弦练习</text>
+          <text class="quest-subtitle font-sans text-gray">长卷：90天精通吉他</text>
+        </view>
+        <!-- 进度条展示 (水墨点) -->
+        <view class="progress-dots">
+          <view class="dot {{index < 3 ? 'completed' : (index === 3 ? 'active' : 'pending')}}" wx:for="{{10}}" wx:key="index" wx:for-item="dot"></view>
+        </view>
+      </view>
+      <view class="quest-daily font-song text-ink">
+        <text class="bullet">●</text> 今日：练习 C 和弦转换 (15min)
+      </view>
+    </paper-card>
+    
+    <!-- 空状态/底部留白 -->
+    <view class="footer-spacer"></view>
+  </scroll-view>
+
+  <!-- 底部悬浮按钮 (优化样式：更小、无白边) -->
+  <view class="fab-container anim-fade-in" style="animation-delay: 0.4s;">
+    <view class="fab-btn" bindtap="goToCreate">
+      <text class="plus-icon font-song">+</text> 
+      <text class="fab-text font-song">新篇章</text>
+    </view>
+  </view>
+</view>

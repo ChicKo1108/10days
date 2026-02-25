@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="header text-center anim-fade-in">
+    <text class="title font-song">落款 · 复盘</text>
+    <view class="divider"></view>
+  </view>
+  
+  <scroll-view scroll-y class="content anim-fade-in" style="animation-delay: 0.2s;">
+    <!-- 评分卡片 -->
+    <paper-card className="score-card">
+      <view class="score-circle">
+        <text class="score-val font-song text-red">9</text>
+        <text class="score-total font-sans text-gray">/10</text>
+      </view>
+      <view class="score-label font-song">本篇章完成度</view>
+      
+      <!-- 盖章动画 -->
+      <view class="seal-anim">
+        <view class="seal-text font-song">上吉</view>
+      </view>
+    </paper-card>
+
+    <!-- 心得回顾列表 -->
+    <view class="review-section">
+      <view class="section-title font-song">
+        <text class="icon">❝</text> 拾遗
+      </view>
+      
+      <view class="note-list">
+        <view class="note-item">
+          <view class="note-day font-song text-gray">Day 3</view>
+          <view class="note-text font-sans">手指有点痛，但坚持下来了。</view>
+        </view>
+        <view class="note-item">
+          <view class="note-day font-song text-gray">Day 7</view>
+          <view class="note-text font-sans">终于能流畅转换和弦了！感觉很棒。</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="footer anim-fade-in" style="animation-delay: 0.4s;">
+    <ink-btn type="primary" bindtap="nextQuest">规划下一篇章</ink-btn>
+  </view>
+</view>
