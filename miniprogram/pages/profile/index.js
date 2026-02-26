@@ -1,66 +1,57 @@
-// pages/profile/index.js
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    userInfo: {
+      nickName: '书童',
+      avatarUrl: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwBHJrFd5b6y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7/0'
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
+  onLoad() {
+    // 模拟获取用户信息
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
+  handlePrivacy() {
+    wx.showToast({
+      title: '隐私协议已阅读',
+      icon: 'none'
+    });
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
+  handleLogout() {
+    wx.showModal({
+      title: '退出登录',
+      content: '确定要暂别书童吗？',
+      confirmColor: '#B22222',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showToast({
+            title: '已退出',
+            icon: 'success'
+          });
+          // 实际逻辑：清除 Token，跳转登录页
+        }
+      }
+    });
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+  handleDeleteAccount() {
+    wx.showModal({
+      title: '注销账号',
+      content: '注销后所有墨迹将无法找回，确定要销毁吗？',
+      confirmColor: '#B22222',
+      confirmText: '确认销毁',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '销毁中...' });
+          setTimeout(() => {
+            wx.hideLoading();
+            wx.showToast({
+              title: '账号已注销',
+              icon: 'none'
+            });
+          }, 1500);
+        }
+      }
+    });
   }
 })

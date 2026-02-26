@@ -1,2 +1,36 @@
-<!--pages/profile/index.wxml-->
-<text>pages/profile/index.wxml</text>
+<view class="container">
+  <!-- 个人信息区 (居中布局) -->
+  <view class="profile-header anim-fade-in">
+    <view class="avatar-wrapper">
+      <image class="avatar" src="https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwBHJrFd5b6y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7/0" mode="aspectFill"></image>
+    </view>
+    <view class="info-content text-center">
+      <text class="nickname font-song">书童</text>
+      <text class="bio font-sans text-gray">十日一进，久久为功</text>
+    </view>
+  </view>
+
+  <!-- 功能列表 (简约水墨风) -->
+  <view class="settings-list anim-fade-in" style="animation-delay: 0.2s;">
+    <view class="ink-card">
+      <view class="list-item" bindtap="handlePrivacy">
+        <text class="item-text font-song">隐私协议</text>
+        <text class="item-arrow font-song text-gray">></text>
+      </view>
+      <view class="divider"></view>
+      <view class="list-item" bindtap="handleLogout">
+        <text class="item-text font-song">退出登录</text>
+        <text class="item-arrow font-song text-gray">></text>
+      </view>
+      <view class="divider"></view>
+      <view class="list-item" bindtap="handleDeleteAccount">
+        <text class="item-text font-song text-red">注销账号</text>
+        <text class="item-arrow font-song text-red">></text>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-info font-sans text-gray">
+    <text>Version 1.0.0</text>
+  </view>
+</view>
