@@ -34,29 +34,21 @@
 **目标：** 1:1 还原 PRD V4.0 定义的“新中式水墨”视觉，完成底部 Tab 架构。
 
 ### 2.1 全局视觉定义
-- [ ] **色板配置**：在 `app.wxss` 中定义 CSS 变量：
-    - 背景色：宣纸色 (`#F7F4ED`) + 纤维纹理
-    - 墨色：松烟墨 (`#2C2C2C`)
-    - 强调：朱砂红 (`#B22222`)
-- [ ] **字体与组件**：
-    - 引入思源宋体（标题）与黑体（正文）。
-    - 封装 `InkButton` (书法笔触按钮)、`PaperCard` (宣纸卡片)、`InkLoading` (水墨加载)。
+- [x] **色板配置**：在 `app.wxss` 中定义 CSS 变量。 ✅
+- [x] **字体与组件**：引入字体，封装 `InkButton`、`PaperCard` 等组件。 ✅
 
 ### 2.2 底部 Tab 架构 (The Hub)
-- [ ] **Tab 配置**：在 `app.json` 中配置 3 个 Tab：
-    1.  **篇章** (首页·十日阵地)
-    2.  **长卷** (总目标全景)
-    3.  **我** (个人中心)
-- [ ] **自定义 TabBar**：实现水墨风格的底部导航栏。
+- [x] **Tab 配置**：配置 3 个 Tab。 ✅
+- [x] **自定义 TabBar**：实现水墨风格的底部导航栏。 ✅
 
 ### 2.3 核心页面静态搭建
-- [ ] **篇章页 (Quest Tab)**：展示进行中的篇章列表、今日目标摘要。
-- [ ] **长卷页 (Master Plan Tab)**：展示已完成/进行中/未来的篇章全景。
-- [ ] **篇章详情页 (Quest Detail)**：核心交互页，展示 10 天进度条、墨迹任务、盖章/留白按钮。
-- [ ] **长卷创建页**：输入总目标、总天数表单。
-- [ ] **篇章创建/修改页**：展示 AI 拆解结果（基础+进阶目标），支持编辑。
-- [ ] **结算页 (Review)**：10 天任务回顾、笔记展示、后续规划跳转。
-- [ ] **我**：个人中心静态页面。
+- [x] **篇章页 (Quest Tab)**：展示进行中的篇章列表。 ✅
+- [x] **长卷页 (Master Plan Tab)**：展示长卷全景。 ✅
+- [x] **篇章详情页 (Quest Detail)**：展示 10 天进度条、盖章/留白按钮。 ✅
+- [x] **长卷创建页**：输入表单。 ✅
+- [x] **篇章创建/修改页**：展示任务拆解。 ✅
+- [x] **结算页 (Review)**：任务回顾。 ✅
+- [x] **我**：个人中心静态页面。 ✅
 
 ---
 
@@ -64,47 +56,62 @@
 **目标：** 实现 PRD V4.0 定义的“长卷-篇章”双层结构及 AI 拆解逻辑。
 
 ### 3.1 数据库建模 (Schema Update)
-- [ ] **MasterPlans 表 (长卷)**：
-    - 字段：`user_id`, `title` (总目标), `total_days` (总天数), `status` (ongoing/completed), `start_date`, `end_date`。
-- [ ] **Quests 表 (篇章)**：
-    - 字段：`plan_id`, `quest_index` (第几篇章), `status` (locked/active/completed), `start_date`, `end_date`。
-- [ ] **DailyActions 表 (每日墨迹)**：
-    - 字段：`quest_id`, `day_index` (1-10), `content` (任务内容), `status` (pending/completed/skipped), `note` (笔记), `completed_at`。
+
+根据 [API 文档](./api_docs.md) 设计，核心实体关系如下：
+
+#### 1. 用户 (Users)
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | UUID | 主键 |
+| `openId` | String | 微信 OpenID (Unique) |
+| `nickName` | String | 昵称 |
+| `avatarUrl` | String | 头像地址 |
+| `createdAt` | DateTime | 注册时间 |
+
+#### 2. 长卷 (Plans)
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | UUID | 主键 |
+| `userId` | UUID | 外键 -> Users.id |
+| `title` | String | 长卷目标 (如：90天精通吉他) |
+| `totalDays` | Integer | 总天数 (如：90) |
+| `status` | Enum | ongoing, completed |
+| `createdAt` | DateTime | 创建时间 |
+
+#### 3. 篇章 (Quests)
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | UUID | 主键 |
+| `planId` | UUID | 外键 -> Plans.id (可空，为空则是独立篇章) |
+| `userId` | UUID | 外键 -> Users.id |
+| `title` | String | 篇章目标 (如：吉他入门：和弦练习) |
+| `orderNum` | Integer | 在长卷中的序号 (第几篇) |
+| `status` | Enum | locked, ongoing, completed, skipped |
+| `baseTask` | Text | 每日必修任务 (基石) |
+| `stageTasks` | JSONB | 阶段任务配置 (JSONB) <br> Structure: `{ stage1Task: ['xxx'], stage2Task: ['xxx'], stage3Task: ['xxx'] }` |
+| `startDate` | Date | 开启日期 |
+| `createdAt` | DateTime | 创建时间 |
+
+#### 4. 打卡记录 (CheckIns)
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | UUID | 主键 |
+| `questId` | UUID | 外键 -> Quests.id (与 dayNum 组成联合索引) |
+| `dayNum` | Integer | 第几天 (1-10) (与 questId 组成联合索引) |
+| `status` | Enum | completed, skipped |
+| `stampText` | Enum | '既成', '愿遂', '笔讫', '墨就' |
+| `note` | Text | 心得笔记 |
+| `createdAt` | DateTime | 打卡时间 |
 
 ### 3.2 核心 API 开发
-- [ ] **长卷管理**：
-    - `POST /api/plans`：创建长卷（触发 AI 拆解前 2 个篇章）。
-    - `GET /api/plans`：获取长卷列表及详情。
-- [ ] **篇章管理**：
-    - `GET /api/quests`：获取篇章列表（首页展示）。
-    - `GET /api/quests/:id`：获取篇章详情（含 10 天任务）。
-    - `POST /api/quests`：手动/自动创建下一篇章。
-    - `PUT /api/quests/:id`：修改未来篇章任务内容。
-- [ ] **执行与打卡**：
-    - `POST /api/actions/:id/checkin`：每日盖章（记录时间、时长）。
-    - `POST /api/actions/:id/skip`：使用留白（校验剩余次数）。
-    - `PUT /api/actions/:id/note`：更新笔记。
+- [ ] 见 [API 文档](./api_docs.md)
 
 ### 3.3 AI 服务集成 (Mock/Real)
-- [ ] **Prompt 工程**：设计符合“1+3”拆解规则（1基础+3进阶）的提示词。
-- [ ] **拆解接口**：
-    - `POST /api/ai/split-plan`：根据总目标拆解为 N 个篇章。
-    - `POST /api/ai/generate-quest`：根据当前进度生成下一篇章内容。
+- [ ] 接入Langchain + deepseek的大模型接口，将deepseek API KEY 保存至环境变量。
 
 ---
 
-## 🖌️ 阶段四：前端交互与动效实现 (Phase 4: Interaction & Animation)
-**目标：** 实现“墨色洇染”、“盖章震动”等沉浸式体验，打通全链路业务。
-
-### 4.1 核心链路联调
-- [ ] **长卷创建链路**：表单提交 -> AI Loading -> 自动生成 -> 确认入库。
-- [ ] **每日执行链路**：首页 -> 篇章详情 -> 盖章/留白 -> 状态更新。
-- [ ] **结算流转链路**：第 10 天盖章 -> 结算页 -> 自动检查下一篇章 -> 跳转创建/修改页。
-
-### 4.2 关键动效开发
-- [ ] **墨色洇染**：长按盖章时，水墨从触点扩散填满圆环。
-- [ ] **印章落款**：结算或打卡成功时，方篆印章配合 `scale` 缩小及音效落下。
-- [ ] **横向卷轴**：长卷页面的左右滑动交互，模拟纸张展开。
+## 🖌️ 阶段四：前后端API对接
 
 ---
 
@@ -114,16 +121,3 @@
 ### 5.1 逻辑验证
 - [ ] **规则测试**：
     - 验证“留白”次数限制（每篇章 3 次）。
-    - 验证“修改权限”（仅限未来天数）。
-    - 验证“AI 拆解规则”（1+3 模式是否准确）。
-- [ ] **边界测试**：总天数不足 10 天的处理；跨天打卡的时间判断。
-
-### 5.2 体验优化
-- [ ] **性能优化**：首屏加载速度，AI 生成时的 Loading 体验（文案轮播）。
-- [ ] **真机适配**：全面屏手势区适配，字体大小调整。
-
----
-
-## 📝 附录：开发资源
-- **PRD 文档**: `docs/prd_v4.0.md`
-- **开发日志**: `docs/stepXX-logs.md`
