@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 120rpx;
+}
+
+.logo-circle {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 4rpx solid var(--ink-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.1);
+}
+
+.logo-text {
+  font-size: 48rpx;
+  color: var(--ink-black);
+  font-weight: bold;
+}
+
+.app-name {
+  font-size: 40rpx;
+  color: var(--ink-black);
+  margin-bottom: 16rpx;
+  letter-spacing: 4rpx;
+  font-weight: bold;
+}
+
+.slogan {
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  opacity: 0.6;
+}
+
+.btn-area {
+  width: 100%;
+  padding: 0 40rpx;
+  box-sizing: border-box;
+}
+
+.login-btn {
+  background-color: #07c160;
+  color: #fff;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  padding: 24rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 16rpx rgba(7, 193, 96, 0.2);
+}
+
+.login-btn:active {
+  opacity: 0.9;
+}
+
+.wechat-icon {
+  margin-right: 12rpx;
+  font-size: 36rpx;
+}
+
+.visitor-link {
+  text-align: center;
+  font-size: 26rpx;
+  padding: 20rpx;
+  opacity: 0.6;
+}

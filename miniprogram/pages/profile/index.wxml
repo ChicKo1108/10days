@@ -2,11 +2,11 @@
   <!-- 个人信息区 (居中布局) -->
   <view class="profile-header anim-fade-in">
     <view class="avatar-wrapper">
-      <image class="avatar" src="https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwBHJrFd5b6y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7/0" mode="aspectFill"></image>
+      <image class="avatar" src="{{userInfo.avatarUrl || 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwBHJrFd5b6y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7/0'}}" mode="aspectFill"></image>
     </view>
     <view class="info-content text-center">
-      <text class="nickname font-song">书童</text>
-      <text class="bio font-sans text-gray">十日一进，久久为功</text>
+      <text class="nickname font-song">{{userInfo.nickName || '未登录'}}</text>
+      <text class="bio font-sans text-gray">{{userInfo.bio || '十日一进，久久为功'}}</text>
     </view>
   </view>
 

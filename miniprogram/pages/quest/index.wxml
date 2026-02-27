@@ -8,30 +8,43 @@
     </view>
   </view>
 
-  <!-- 列表内容 (添加顶部 padding 避开固定头部) -->
+  <!-- 列表内容 -->
   <scroll-view scroll-y class="content anim-fade-in" style="animation-delay: 0.2s;">
     <!-- 列表项：使用卡片封装 -->
-    <paper-card wx:for="{{[1,2,3]}}" wx:key="*this" bindtap="goToDetail" data-id="{{item}}">
-      <view class="quest-item">
-        <view class="quest-info">
-          <text class="quest-title font-song">吉他入门：和弦练习</text>
-          <text class="quest-subtitle font-sans text-gray">长卷：90天精通吉他</text>
+    <block wx:if="{{quests.length > 0}}">
+      <paper-card wx:for="{{quests}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+        <view class="quest-item">
+          <view class="quest-info">
+            <text class="quest-title font-song">{{item.title}}</text>
+            <text class="quest-subtitle font-sans text-gray" wx:if="{{item.planTitle}}">长卷：{{item.planTitle}}</text>
+          </view>
+          <!-- 进度条展示 (水墨点) -->
+          <view class="progress-dots">
+            <!-- progress: 0-pending, 1-completed, 2-skipped -->
+            <view 
+              class="dot {{p === 1 ? 'completed' : (p === 2 ? 'skipped' : (index === item.currentDay - 1 ? 'active' : 'pending'))}}" 
+              wx:for="{{item.progress}}" 
+              wx:for-item="p" 
+              wx:key="index">
+            </view>
+          </view>
         </view>
-        <!-- 进度条展示 (水墨点) -->
-        <view class="progress-dots">
-          <view class="dot {{index < 3 ? 'completed' : (index === 3 ? 'active' : 'pending')}}" wx:for="{{10}}" wx:key="index" wx:for-item="dot"></view>
+        <view class="quest-daily font-song text-ink">
+          <text class="bullet">●</text> 今日：{{item.dailyTask}}
         </view>
-      </view>
-      <view class="quest-daily font-song text-ink">
-        <text class="bullet">●</text> 今日：练习 C 和弦转换 (15min)
-      </view>
-    </paper-card>
+      </paper-card>
+    </block>
     
-    <!-- 空状态/底部留白 -->
+    <!-- 空状态 -->
+    <view wx:else class="empty-state font-song text-gray">
+      <text>暂无进行中的篇章，点击右下角开启</text>
+    </view>
+    
+    <!-- 底部留白 -->
     <view class="footer-spacer"></view>
   </scroll-view>
 
-  <!-- 底部悬浮按钮 (优化样式：更小、无白边) -->
+  <!-- 底部悬浮按钮 -->
   <view class="fab-container anim-fade-in" style="animation-delay: 0.4s;">
     <view class="fab-btn" bindtap="goToCreate">
       <text class="plus-icon font-song">+</text> 

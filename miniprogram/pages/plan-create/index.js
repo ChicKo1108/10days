@@ -1,3 +1,5 @@
+const api = require('../../api/index');
+
 Page({
   data: {
     step: 1, // 1: 选择类型, 2: 填写表单
@@ -5,9 +7,22 @@ Page({
     loading: false,
     title: '',
     days: '',
-    chapterCount: 'N', // 计算出的篇章数
-    planIndex: null, // 必须初始化为 null
-    plans: ['90天精通吉他', '30天阅读挑战'] // Mock data
+    chapterCount: 'N',
+    planIndex: null,
+    plans: [], // 存储 {id, title}
+    planNames: [] // 仅存储 title 用于 picker
+  },
+
+  onLoad() {
+    this.fetchPlans();
+  },
+
+  fetchPlans() {
+    api.plan.getPlans().then(res => {
+      const plans = res.list;
+      const planNames = plans.map(p => p.title);
+      this.setData({ plans, planNames });
+    });
   },
 
   selectType(e) {
@@ -52,7 +67,7 @@ Page({
 
   bindPlanChange(e) {
     this.setData({
-      planIndex: Number(e.detail.value) // 确保转为数字
+      planIndex: Number(e.detail.value)
     });
   },
 
@@ -63,7 +78,6 @@ Page({
   },
 
   startPlan() {
-    // 简单校验
     if (!this.data.title) {
       wx.showToast({ title: '请输入目标名称', icon: 'none' });
       return;
@@ -75,13 +89,33 @@ Page({
 
     this.setData({ loading: true });
     
-    // Mock API call & AI Generation
-    setTimeout(() => {
-      this.setData({ loading: false });
-      // 传递参数到规划页
-      wx.navigateTo({ 
-        url: `/pages/quest-create/index?type=${this.data.type}&title=${this.data.title}` 
+    const payload = {
+      type: this.data.type,
+      title: this.data.title,
+      days: this.data.days ? Number(this.data.days) : undefined,
+      planId: this.data.planIndex !== null ? this.data.plans[this.data.planIndex].id : undefined
+    };
+
+    api.plan.createPlan(payload)
+      .then(res => {
+        const { id, preview } = res;
+        this.setData({ loading: false });
+        
+        // 跳转到任务确认页 (复用 quest-create 页面)
+        // 传递预览数据太长，可以存到全局或本地存储，这里先简化传递核心参数
+        // 建议：quest-create 页面根据 ID 再次获取详情，或者把 preview 传过去
+        // 鉴于 2.2 接口返回了 preview，我们直接通过 event channel 或 storage 传递
+        
+        wx.setStorageSync('temp_plan_preview', { id, preview });
+        
+        wx.navigateTo({ 
+          url: `/pages/quest-create/index?id=${id}&isPreview=true` 
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        this.setData({ loading: false });
+        wx.showToast({ title: '生成失败，请重试', icon: 'none' });
       });
-    }, 2000);
   }
-})
+});

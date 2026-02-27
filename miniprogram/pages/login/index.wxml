@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="logo-area anim-fade-in">
+    <view class="logo-circle">
+      <text class="logo-text font-song">十日</text>
+    </view>
+    <text class="app-name font-song">十日计划</text>
+    <text class="slogan font-sans text-gray">静待花开，笃行致远</text>
+  </view>
+
+  <view class="btn-area anim-fade-in" style="animation-delay: 0.2s;">
+    <button class="login-btn" bindtap="handleLogin" loading="{{loading}}">
+      <text class="wechat-icon">❖</text> 微信一键登录
+    </button>
+    <view class="visitor-link font-sans text-gray" bindtap="handleVisitor">暂不登录，先逛逛</view>
+  </view>
+</view>

@@ -1,8 +1,11 @@
+const api = require('../../api/index');
+
 Page({
   data: {
+    id: '', // Quest ID (if available)
     isEdit: false,
     title: '',
-    planTitle: '', // 所属长卷标题
+    planTitle: '',
     type: 'quest', // quest | plan
     baseTask: '',
     stages: [
@@ -10,82 +13,46 @@ Page({
       { name: '进阶期', days: 'Day 4-7', task: '' },
       { name: '冲刺期', days: 'Day 8-10', task: '' }
     ],
-    // 长卷模式下的多篇章预览
-    chapters: [] 
+    chapters: [],
+    loading: false
   },
 
   onLoad(options) {
-    const { title, type } = options;
+    const { id, isPreview, title, type } = options;
     
-    // 如果没有 title，说明可能是从详情页进来的编辑模式，或者参数丢失
-    // 这里简单判断，如果有 title 则是新建，否则默认为编辑(仅为演示)
-    // 实际应根据 options.id 判断
-    
-    if (title) {
-      this.setData({ 
-        title, // 这里 title 在 plan 模式下其实是 planTitle
-        planTitle: type === 'plan' ? title : '',
-        type,
-        isEdit: false 
-      });
-      this.generatePlan(title, type);
-    } else {
-      // 模拟编辑模式加载数据
-      this.setData({ 
-        isEdit: true,
-        title: '吉他入门',
-        baseTask: '每日练习爬格子 15 分钟',
-        stages: [
-          { name: '入门期', days: 'Day 1-3', task: '熟悉 C、Am 和弦指法' },
-          { name: '进阶期', days: 'Day 4-7', task: '练习 C-Am 和弦转换，速度 60bpm' },
-          { name: '冲刺期', days: 'Day 8-10', task: '尝试弹唱《小星星》前四小节' }
-        ]
-      });
+    // 如果是创建流程传来的预览
+    if (isPreview && id) {
+      this.setData({ id, type: 'quest', isEdit: false });
+      
+      const previewData = wx.getStorageSync('temp_plan_preview');
+      if (previewData && previewData.id === id) {
+        const { preview } = previewData;
+        this.setData({
+          title: title || '新篇章', // Note: title might need to be passed or stored
+          baseTask: preview.baseTask,
+          stages: preview.stages
+        });
+      }
+    } 
+    // 如果是编辑模式
+    else if (id) {
+      this.setData({ id, isEdit: true });
+      this.fetchQuestDetail(id);
+    }
+    // 纯手动创建 (不走 AI) - 暂未实现入口，保留逻辑
+    else if (title) {
+      this.setData({ title, type: type || 'quest' });
     }
   },
 
-  // Mock AI Generation
-  generatePlan(title, type) {
-    // 模拟书童根据标题生成计划
-    if (type === 'plan') {
-       // 长卷模式：生成前3个篇章
-       const chapters = [];
-       for(let i=0; i<3; i++) {
-         // 前2个解锁，第3个锁定
-         const isLocked = i >= 2; 
-         chapters.push({
-           isLocked,
-           baseTask: isLocked ? '' : `坚持每日针对「${title}」阶段${i+1}的基础训练`,
-           stages: [
-              { name: '入门期', days: 'Day 1-3', task: isLocked ? '' : `了解阶段${i+1}核心概念` },
-             { name: '进阶期', days: 'Day 4-7', task: isLocked ? '' : `强化阶段${i+1}专项技巧` },
-             { name: '冲刺期', days: 'Day 8-10', task: isLocked ? '' : `完成阶段${i+1}实战演练` }
-            ]
-         });
-       }
-       // 模拟更多篇章...
-       chapters.push({ isLocked: true }); // 第4个
-       
-       this.setData({ chapters });
-
-    } else {
-      // 单篇章模式
-      const aiTasks = {
-        base: `坚持每日针对「${title}」的基础训练`,
-        s1: `了解「${title}」的基本概念与核心技巧`,
-        s2: `针对「${title}」进行专项强化练习`,
-        s3: `尝试完成一次完整的「${title}」实战应用`
-      };
-
+  fetchQuestDetail(id) {
+    api.quest.getQuestDetail(id).then(res => {
       this.setData({
-        baseTask: aiTasks.base,
-        stages: [
-          { name: '入门期', days: 'Day 1-3', task: aiTasks.s1 },
-          { name: '进阶期', days: 'Day 4-7', task: aiTasks.s2 },
-          { name: '冲刺期', days: 'Day 8-10', task: aiTasks.s3 }
-        ]
+        title: res.title,
+        baseTask: res.tasks.base,
+        stages: res.tasks.stages
       });
-    }
+    });
   },
 
   handleInput(e) {
@@ -101,49 +68,65 @@ Page({
     this.setData({ stages });
   },
 
-  handleChapterBaseInput(e) {
-    const index = e.currentTarget.dataset.index;
-    const value = e.detail.value;
-    const chapters = this.data.chapters;
-    chapters[index].baseTask = value;
-    this.setData({ chapters });
-  },
-
-  handleChapterStageInput(e) {
-    const cindex = e.currentTarget.dataset.cindex;
-    const sindex = e.currentTarget.dataset.sindex;
-    const value = e.detail.value;
-    const chapters = this.data.chapters;
-    chapters[cindex].stages[sindex].task = value;
-    this.setData({ chapters });
-  },
-
   confirmPlan() {
-    if (this.data.type === 'quest' && !this.data.baseTask) {
+    if (!this.data.baseTask) {
       wx.showToast({ title: '请完善基础任务', icon: 'none' });
       return;
     }
-    // 长卷模式简单校验
-    if (this.data.type === 'plan' && (!this.data.chapters[0].baseTask)) {
-       wx.showToast({ title: '请至少完善第一篇章', icon: 'none' });
-       return;
-    }
 
+    this.setData({ loading: true });
     wx.showLoading({ title: '墨迹定格中...' });
-    
-    setTimeout(() => {
-      wx.hideLoading();
-      wx.showToast({ title: this.data.isEdit ? '修订完成' : '篇章已启', icon: 'success' });
-      
-      setTimeout(() => {
-        // 返回上一页或跳转到详情页
-        if (this.data.isEdit) {
-          wx.navigateBack();
-        } else {
-          // 新建完成后跳转到详情页 (Mock ID)
-          wx.redirectTo({ url: '/pages/quest-detail/index?id=1' });
+
+    const payload = {
+      baseTask: this.data.baseTask,
+      stages: this.data.stages
+    };
+
+    // 如果是新建确认 (AI 预览后)
+    if (!this.data.isEdit && this.data.id) {
+      api.plan.confirmPlan(this.data.id, payload)
+        .then(() => {
+          this.handleSuccess('篇章已启');
+        })
+        .catch(this.handleError);
+    } 
+    // 如果是编辑更新
+    else if (this.data.isEdit && this.data.id) {
+      api.quest.updateQuest(this.data.id, {
+        title: this.data.title,
+        tasks: {
+          base: this.data.baseTask,
+          stages: this.data.stages
         }
-      }, 1500);
-    }, 1000);
+      })
+        .then(() => {
+          this.handleSuccess('修订完成');
+        })
+        .catch(this.handleError);
+    }
+  },
+
+  handleSuccess(msg) {
+    wx.hideLoading();
+    this.setData({ loading: false });
+    wx.showToast({ title: msg, icon: 'success' });
+    
+    // 清除预览缓存
+    wx.removeStorageSync('temp_plan_preview');
+
+    setTimeout(() => {
+      if (this.data.isEdit) {
+        wx.navigateBack();
+      } else {
+        wx.redirectTo({ url: `/pages/quest-detail/index?id=${this.data.id}` });
+      }
+    }, 1500);
+  },
+
+  handleError(err) {
+    console.error(err);
+    wx.hideLoading();
+    this.setData({ loading: false });
+    wx.showToast({ title: '操作失败', icon: 'none' });
   }
-})
+});

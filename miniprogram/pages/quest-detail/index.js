@@ -1,51 +1,128 @@
+const api = require('../../api/index');
+
 Page({
   data: {
-    currentDay: 3, // 实际进行到的天数 (今天)
-    selectedDay: 3, // 用户当前查看的天数
-    isPressed: false,
+    id: '',
+    title: '',
+    planTitle: '',
+    currentDay: 1, // 实际进行到的天数
+    selectedDay: 1, // 用户当前查看的天数
     status: 'pending', // pending, completed, skipped, locked
     stampText: '', // 既成, 愿遂, 笔讫, 墨成
     skippedStamp: false, // 是否是留白印章
-    planTitle: '90天精通吉他', // 模拟所属长卷标题，为空则不显示
-    
-    // 模拟历史数据
-    history: {
-      1: { status: 'completed', stamp: '既成' },
-      2: { status: 'completed', stamp: '墨就' },
-      3: { status: 'pending', stamp: '' },
-      4: { status: 'locked', stamp: '' },
-      // ...
-    }
+    history: {}, // 历史数据 { dayNum: { status, stamp, note } }
+    tasks: {}, // 任务详情 { base, stages: [] }
+    dailyTask: '', // 当前选中日期的任务描述
+    note: '', // 今日心得
+    loading: true,
+    isPressed: false,
+    remainingSkips: 3 // 剩余留白次数 (需要后端返回，暂时 mock)
   },
 
   onLoad(options) {
-    // 默认选中当前进行的天数
-    this.setData({
-      selectedDay: this.data.currentDay
-    });
-    this.updateCurrentStatus();
+    const { id } = options;
+    if (id) {
+      this.setData({ id });
+      this.fetchDetail(id);
+    }
+  },
+
+  fetchDetail(id) {
+    api.quest.getQuestDetail(id)
+      .then(res => {
+        const { title, planTitle, currentDay, status, history, tasks } = res;
+        
+        // 计算剩余留白次数
+        let usedSkips = 0;
+        Object.values(history).forEach(h => {
+          if (h.status === 'skipped') usedSkips++;
+        });
+
+        this.setData({
+          title,
+          planTitle,
+          currentDay,
+          selectedDay: currentDay, // 默认选中今天
+          status, // 篇章整体状态，需转换为每日状态
+          history,
+          tasks,
+          remainingSkips: 3 - usedSkips,
+          loading: false
+        });
+        
+        this.updateCurrentStatus();
+      })
+      .catch(err => {
+        console.error(err);
+        wx.showToast({ title: '获取详情失败', icon: 'none' });
+      });
   },
   
   switchDay(e) {
     const day = e.currentTarget.dataset.day;
-    // 如果点击的是未来锁定的天数(大于今天)，暂不处理或给提示
-    // if (day > this.data.currentDay) {
-    //   wx.showToast({ title: '时日未到', icon: 'none' });
-    //   return;
-    // }
     this.setData({ selectedDay: day });
     this.updateCurrentStatus();
   },
 
   updateCurrentStatus() {
-    const { selectedDay, history } = this.data;
-    const dayData = history[selectedDay] || { status: 'pending', stamp: '' };
+    const { selectedDay, currentDay, history, tasks } = this.data;
     
+    // 获取选中日期的任务描述
+    let taskDesc = tasks.base || '';
+    if (tasks.stages) {
+      // 简单逻辑：根据天数判断阶段
+      let stageTask = '';
+      if (selectedDay <= 3) stageTask = tasks.stages[0]?.task;
+      else if (selectedDay <= 7) stageTask = tasks.stages[1]?.task;
+      else stageTask = tasks.stages[2]?.task;
+      
+      if (stageTask) taskDesc += `\n${stageTask}`;
+    }
+
+    // 获取选中日期的状态
+    let dayStatus = 'locked';
+    let stamp = '';
+    let note = '';
+    let skipped = false;
+
+    if (selectedDay < currentDay) {
+      // 过去的日子，从 history 取
+      const h = history[selectedDay];
+      if (h) {
+        dayStatus = h.status;
+        stamp = h.stamp;
+        note = h.note || '';
+        skipped = h.status === 'skipped';
+      } else {
+        dayStatus = 'skipped'; // 过去未完成视为跳过? 或者 pending? 视业务逻辑
+      }
+    } else if (selectedDay === currentDay) {
+      // 今天，先看 history 有没有(可能已完成)，没有则是 pending
+      const h = history[selectedDay];
+      if (h) {
+        dayStatus = h.status;
+        stamp = h.stamp;
+        note = h.note || '';
+        skipped = h.status === 'skipped';
+      } else {
+        dayStatus = 'pending';
+      }
+    } else {
+      // 未来
+      dayStatus = 'locked';
+    }
+
     this.setData({
-      status: dayData.status,
-      stampText: dayData.stamp,
-      skippedStamp: dayData.status === 'skipped'
+      status: dayStatus,
+      stampText: stamp,
+      skippedStamp: skipped,
+      dailyTask: taskDesc,
+      note
     });
+  },
+
+  handleInput(e) {
+    this.setData({ note: e.detail.value });
   },
 
   handleStampStart() {
@@ -58,66 +135,81 @@ Page({
   },
 
   handleCheckIn() {
-    // 仅允许对“今天”且“未完成”的任务盖章
     if (this.data.selectedDay !== this.data.currentDay || this.data.status !== 'pending') return;
     
     wx.vibrateShort({ type: 'heavy' });
     
-    // 随机获取印章文字
-    const stamps = ['既成', '愿遂', '笔讫', '墨就'];
-    const randomStamp = stamps[Math.floor(Math.random() * stamps.length)];
-    
-    // 更新本地数据
-    const newHistory = { ...this.data.history };
-    newHistory[this.data.currentDay] = { status: 'completed', stamp: randomStamp };
+    const { id, currentDay, note } = this.data;
 
-    this.setData({ 
-      status: 'completed',
-      stampText: randomStamp,
-      skippedStamp: false,
-      history: newHistory
-    });
-    
-    console.log('Stamped:', randomStamp);
-    
-    // 第10天跳转逻辑
-    if (this.data.currentDay === 10) {
-      setTimeout(() => {
-        wx.navigateTo({ url: '/pages/review/index' });
-      }, 1500);
-    }
+    api.quest.checkIn(id, { day: currentDay, note })
+      .then(res => {
+        const { stamp, status } = res;
+        
+        const newHistory = { ...this.data.history };
+        newHistory[currentDay] = { status, stamp, note };
+
+        this.setData({ 
+          status,
+          stampText: stamp,
+          skippedStamp: false,
+          history: newHistory
+        });
+        
+        wx.showToast({ title: '打卡成功', icon: 'success' });
+
+        if (currentDay === 10) {
+          setTimeout(() => {
+            wx.navigateTo({ url: `/pages/review/index?id=${id}` });
+          }, 1500);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        wx.showToast({ title: err.msg || '打卡失败', icon: 'none' });
+      });
   },
 
   handleSkip() {
-    // 仅允许对“今天”且“未完成”的任务留白
     if (this.data.selectedDay !== this.data.currentDay || this.data.status !== 'pending') return;
 
     wx.showModal({
       title: '使用留白',
-      content: '今日暂且歇笔？(剩余次数: 2)',
+      content: `今日暂且歇笔？(剩余次数: ${this.data.remainingSkips})`,
       confirmColor: '#B22222',
       success: (res) => {
         if (res.confirm) {
-          const newHistory = { ...this.data.history };
-          newHistory[this.data.currentDay] = { status: 'skipped', stamp: '留白' };
+          const { id, currentDay } = this.data;
+          
+          api.quest.skipTask(id, { day: currentDay })
+            .then(res => {
+              const { remainingSkips, status } = res;
+              
+              const newHistory = { ...this.data.history };
+              newHistory[currentDay] = { status, stamp: '留白' };
 
-          this.setData({
-            status: 'skipped',
-            stampText: '留白',
-            skippedStamp: true,
-            history: newHistory
-          });
+              this.setData({
+                status,
+                stampText: '留白',
+                skippedStamp: true,
+                history: newHistory,
+                remainingSkips
+              });
+            })
+            .catch(err => {
+              console.error(err);
+              wx.showToast({ title: err.msg || '操作失败', icon: 'none' });
+            });
         }
       }
     });
   },
 
   goToEdit() {
-    wx.navigateTo({ url: '/pages/quest-create/index' });
+    // 暂未实现编辑页跳转，可复用创建页或新增编辑页
+    wx.showToast({ title: '修订功能开发中', icon: 'none' });
   },
 
   goToPlanDetail() {
-    // 跳转到长卷详情页 (假设 ID 为 1)
     wx.switchTab({ url: '/pages/plan/index' }); 
   }
-})
+});

@@ -61,9 +61,9 @@
         <text class="label font-song">所属长卷 (可选)</text>
         <text class="clear-btn font-sans text-gray" wx:if="{{planIndex !== null}}" bindtap="clearPlanSelection">清除选择</text>
       </view>
-      <picker bindchange="bindPlanChange" value="{{planIndex}}" range="{{plans}}">
+      <picker bindchange="bindPlanChange" value="{{planIndex}}" range="{{planNames}}">
         <view class="picker font-sans {{planIndex !== null ? 'text-ink' : 'text-gray'}}">
-          {{planIndex !== null ? plans[planIndex] : '点击选择关联的长卷...'}}
+          {{planIndex !== null ? planNames[planIndex] : '点击选择关联的长卷...'}}
         </view>
       </picker>
     </view>
@@ -75,6 +75,6 @@
 
   <!-- Loading 状态 -->
   <view class="loading-area anim-fade-in" wx:if="{{loading}}">
-    <ink-loading text="正在为您裁切篇章..."></ink-loading>
+    <ink-loading text="书童正在为您规划篇章..."></ink-loading>
   </view>
 </view>

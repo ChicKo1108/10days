@@ -1,56 +1,57 @@
+const api = require('../../api/index');
+
 Page({
   data: {
-    plans: [
-      {
-        id: 1,
-        title: '90天精通吉他',
-        totalDays: 90,
-        chapters: [
-          { id: 101, num: 1, status: 'completed', rate: 95 },
-          { id: 102, num: 2, status: 'completed', rate: 88 },
-          { id: 103, num: 3, status: 'ongoing', rate: 40 },
-          { id: 104, num: 4, status: 'locked', rate: 0 },
-          { id: 105, num: 5, status: 'locked', rate: 0 },
-          { id: 106, num: 6, status: 'locked', rate: 0 },
-        ]
-      },
-      {
-        id: 2,
-        title: '30天阅读挑战',
-        totalDays: 30,
-        chapters: [
-          { id: 201, num: 1, status: 'completed', rate: 100 },
-          { id: 202, num: 2, status: 'completed', rate: 92 },
-          { id: 203, num: 3, status: 'completed', rate: 85 }
-        ]
-      },
-      {
-        id: 3,
-        title: '60天减脂计划',
-        totalDays: 60,
-        chapters: [
-          { id: 301, num: 1, status: 'ongoing', rate: 60 },
-          { id: 302, num: 2, status: 'locked', rate: 0 },
-          { id: 303, num: 3, status: 'locked', rate: 0 },
-          { id: 304, num: 4, status: 'locked', rate: 0 },
-          { id: 305, num: 5, status: 'locked', rate: 0 },
-          { id: 306, num: 6, status: 'locked', rate: 0 },
-        ]
-      },
-      {
-        id: 4,
-        title: '100个单词突击',
-        totalDays: 20,
-        chapters: [
-          { id: 401, num: 1, status: 'locked', rate: 0 },
-          { id: 402, num: 2, status: 'locked', rate: 0 }
-        ]
-      }
-    ]
+    plans: [],
+    loading: true
   },
 
-  onLoad(options) {
+  onShow() {
+    // 检查登录状态
+    const token = wx.getStorageSync('token');
+    const isVisitor = wx.getStorageSync('is_visitor');
 
+    // 如果有token，说明已登录，清除游客状态（可选）
+    if (token) {
+        wx.removeStorageSync('is_visitor');
+    }
+
+    if (!token && !isVisitor) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        confirmText: '去登录',
+        showCancel: false,
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/login/index' });
+          }
+        }
+      });
+      return;
+    }
+    this.fetchPlans();
+  },
+
+  onPullDownRefresh() {
+    this.fetchPlans().then(() => {
+      wx.stopPullDownRefresh();
+    });
+  },
+
+  fetchPlans() {
+    return api.plan.getPlans()
+      .then(res => {
+        this.setData({
+          plans: res.list, // 后端返回的数据结构 { list: [...] }
+          loading: false
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        wx.showToast({ title: '获取长卷失败', icon: 'none' });
+        this.setData({ loading: false });
+      });
   },
 
   goToChapter(e) {
@@ -59,11 +60,10 @@ Page({
       wx.showToast({ title: '前序篇章未完，静候时机', icon: 'none' });
       return;
     }
-    // 跳转到详情页 (只读或编辑)
     wx.navigateTo({ url: `/pages/quest-detail/index?id=${id}` });
   },
 
   goToCreatePlan() {
     wx.navigateTo({ url: '/pages/plan-create/index' });
   }
-})
+});

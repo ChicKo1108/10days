@@ -3,6 +3,7 @@
     "pages/quest/index",
     "pages/plan/index",
     "pages/profile/index",
+    "pages/login/index",
     "pages/quest-detail/index",
     "pages/plan-create/index",
     "pages/quest-create/index",

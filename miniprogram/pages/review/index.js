@@ -1,66 +1,53 @@
-// pages/review/index.js
+const api = require('../../api/index');
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    id: '',
+    score: 0,
+    summary: '',
+    stats: {
+      completed: 0,
+      skipped: 0
+    },
+    notes: [],
+    loading: true,
+    showSeal: false
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad(options) {
-
+    const { id } = options;
+    if (id) {
+      this.setData({ id });
+      this.fetchReview(id);
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
+  fetchReview(id) {
+    api.review.getReview(id)
+      .then(res => {
+        const { score, summary, stats, notes } = res;
+        this.setData({
+          score,
+          summary,
+          stats,
+          notes,
+          loading: false
+        });
 
+        // 延迟显示印章动画
+        setTimeout(() => {
+          this.setData({ showSeal: true });
+        }, 500);
+      })
+      .catch(err => {
+        console.error(err);
+        wx.showToast({ title: '获取复盘失败', icon: 'none' });
+        this.setData({ loading: false });
+      });
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+  nextQuest() {
+    // 跳转到创建页或长卷页
+    wx.switchTab({ url: '/pages/plan/index' });
   }
-})
+});

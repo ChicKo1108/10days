@@ -4,18 +4,9 @@ const response = require('../utils/response');
 // 3.1 获取用户信息
 exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findOne();
+        const user = await User.findByPk(req.user.id);
         if (!user) {
-            const newUser = await User.create({
-                openId: 'mock_openid_' + Date.now(),
-                nickName: '书童',
-                avatarUrl: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwBHJrFd5b6y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7y8WJ5e7/0'
-            });
-            return response.success(res, {
-                nickName: newUser.nickName,
-                avatarUrl: newUser.avatarUrl,
-                bio: '十日一进，久久为功'
-            });
+            return response.notFound(res, 'User not found');
         }
 
         response.success(res, {
@@ -37,7 +28,7 @@ exports.logout = async (req, res) => {
 // 3.3 注销账号
 exports.destroyAccount = async (req, res) => {
     try {
-        const user = await User.findOne();
+        const user = await User.findByPk(req.user.id);
         if (user) {
             await user.destroy();
         }
