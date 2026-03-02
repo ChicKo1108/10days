@@ -1,8 +1,5 @@
 <view class="container">
   <view class="logo-area anim-fade-in">
-    <view class="logo-circle">
-      <text class="logo-text font-song">十日</text>
-    </view>
     <text class="app-name font-song">十日计划</text>
     <text class="slogan font-sans text-gray">静待花开，笃行致远</text>
   </view>

@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const sequelize = require('./src/config/database');
 const routes = require('./src/routes');
-require('dotenv').config();
 
 // Import models to ensure relations are defined
 require('./src/models/User');
