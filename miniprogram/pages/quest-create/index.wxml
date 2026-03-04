@@ -44,7 +44,7 @@
         </block>
 
         <block wx:else>
-           <paper-card className="locked-card">
+           <paper-card class="locked-card">
              <view class="locked-content text-center">
                <text class="locked-icon">🔒</text>
                <text class="locked-text font-song text-gray">完成前序篇章后解锁</text>
